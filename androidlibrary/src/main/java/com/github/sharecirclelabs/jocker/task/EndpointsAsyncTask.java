@@ -1,10 +1,7 @@
 package com.github.sharecirclelabs.jocker.task;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.util.Pair;
 
-import com.github.sharecirclelabs.jocker.JokeActivity;
 import com.github.sharecirclelabs.jocker.myApi.MyApi;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -13,14 +10,22 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 
 import java.io.IOException;
 
-public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+public class EndpointsAsyncTask extends AsyncTask<String, Void, String> {
+
     private static MyApi myApiService = null;
-    private Context context;
+    private AsyncTaskListener mListener = null;
+    private Exception mError = null;
+
+    public static interface AsyncTaskListener {
+        public void onComplete(String jsonString, Exception e);
+    }
 
     @Override
-    protected String doInBackground(Pair<Context, String>... params) {
+    protected String doInBackground(String... params) {
 
-        if(myApiService == null) {  // Only do this once
+        String content = null;
+
+        if (myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
                     // options for running against local devappserver
@@ -38,16 +43,31 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
             // end options for devappserver
             myApiService = builder.build();
         }
-        context = params[0].first;
         try {
-            return myApiService.getJoke().execute().getData();
+            content = myApiService.getJoke().execute().getData();
         } catch (IOException e) {
-            return e.getMessage();
+            mError = e;
         }
+
+        return content;
+    }
+
+    public EndpointsAsyncTask setListener(AsyncTaskListener listener) {
+        this.mListener = listener;
+        return this;
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        ((JokeActivity) context).setJoke(result);
+    protected void onPostExecute(String s) {
+        if (this.mListener != null)
+            this.mListener.onComplete(s, mError);
+    }
+
+    @Override
+    protected void onCancelled() {
+        if (this.mListener != null) {
+            mError = new InterruptedException("AsyncTask cancelled");
+            this.mListener.onComplete(null, mError);
+        }
     }
 }
