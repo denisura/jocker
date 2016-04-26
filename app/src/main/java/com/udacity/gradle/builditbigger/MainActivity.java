@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.github.sharecirclelabs.jocker.JokeActivity;
-import com.github.sharecirclelabs.jocker.JokeTellerClass;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -44,10 +43,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void tellJoke(View view){
 
-        JokeTellerClass teller = new JokeTellerClass();
-        Intent intent = JokeActivity.newIntent(this,teller.getJoke());
+        Intent intent = JokeActivity.newIntent(this);
         startActivity(intent);
-//        Toast.makeText(this, teller.getJoke(), Toast.LENGTH_SHORT).show();
     }
 
 
