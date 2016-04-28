@@ -20,8 +20,26 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile project(path: ':backend', configuration: 'android-endpoints')
-
+    testCompile 'junit:junit:4.12'
 }
+
+
+task runAppEngineIntegrationTest(type: GradleBuild) {
+    group = 'GCE'
+    description = 'Launches the GCE local development server\n' +
+            'Runs all tests\n' +
+            'Shuts the server down again'
+    dependsOn ":backend:appengineRun"
+    finalizedBy ":backend:appengineStop"
+    project(":backend").afterEvaluate { backend ->
+        backend.extensions.appengine.daemon = true
+    }
+    tasks = ['connectedAndroidTest']
+
+    doLast {
+        println "started the server!"
+    }
+}
+
