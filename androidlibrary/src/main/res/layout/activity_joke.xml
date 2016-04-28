@@ -12,9 +12,16 @@
 
     <TextView
         android:id="@+id/joke_textview"
-        android:text="@string/missing_joke"
+        android:text=""
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
