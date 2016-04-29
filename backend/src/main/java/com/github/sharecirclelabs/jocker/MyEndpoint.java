@@ -37,7 +37,7 @@ public class MyEndpoint {
     @ApiMethod(name = "getJoke")
     public MyBean getJoke() {
         MyBean response = new MyBean();
-        JokeTellerClass teller = new JokeTellerClass();
+        JokeProvider teller = new JokeProvider();
         response.setData(teller.getJoke());
         return response;
     }
